@@ -1,0 +1,25 @@
+{
+  "intent": "build a todo CLI",
+  "constraints": {},
+  "acceptance_criteria": [
+    "works locally",
+    "passes simple tests"
+  ],
+  "deliverables": [
+    "prototype"
+  ],
+  "steps": [
+    {
+      "step_id": "1",
+      "description": "Create repo skeleton",
+      "inputs": {},
+      "expected_output": "repo skeleton"
+    },
+    {
+      "step_id": "2",
+      "description": "Implement minimal Planner",
+      "inputs": {},
+      "expected_output": "JSON plan output"
+    }
+  ]
+}

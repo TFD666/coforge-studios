@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "PlannerPlan",
+    "type": "object",
+    "required": ["intent", "constraints", "acceptance_criteria", "deliverables", "steps"],
+    "properties": {
+      "intent": { "type": "string" },
+      "constraints": { "type": "object" },
+      "acceptance_criteria": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "deliverables": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["step_id", "description", "inputs", "expected_output"],
+          "properties": {
+            "step_id": { "type": "string" },
+            "description": { "type": "string" },
+            "inputs": { "type": "object" },
+            "expected_output": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+  
