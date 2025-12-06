@@ -1,42 +1,69 @@
-import os
-import json
-import click
+# cli/main.py
 
-SESSION_FILE = "latest_session.json"
+import argparse
+import sys
+from agents.planner import Planner
+from agents.planner_utils import pretty_print_plan
 
-@click.group()
-def cli():
-    """Coforge Studios CLI - Planner placeholder"""
-    pass
+def main():
+    parser = argparse.ArgumentParser(description="Coforge Studios CLI")
+    
+    subparsers = parser.add_subparsers(dest="command")
 
-@cli.command()
-@click.argument("prompt", nargs=-1)
-def create(prompt):
-    """Create a new plan (placeholder Planner)."""
-    user_input = " ".join(prompt)
-    # placeholder planner behavior
-    plan = {
-        "intent": user_input,
-        "constraints": {},
-        "acceptance_criteria": ["works locally", "passes simple tests"],
-        "deliverables": ["prototype"],
-        "steps": [
-            {"step_id": "1", "description": "Create repo skeleton", "inputs": {}, "expected_output": "repo skeleton"},
-            {"step_id": "2", "description": "Implement minimal Planner", "inputs": {}, "expected_output": "JSON plan output"}
-        ]
-    }
-    with open(SESSION_FILE, "w", encoding="utf-8") as f:
-        json.dump(plan, f, indent=2)
-    click.echo("Planner (placeholder) created a plan and saved to latest_session.json")
-    click.echo(json.dumps(plan, indent=2))
+    # ----------------------------------------------------
+    # create command
+    # ----------------------------------------------------
+    create_cmd = subparsers.add_parser("create", help="Create a new AI-assisted plan")
+    create_cmd.add_argument("request", type=str, help="User request for the Planner agent")
+    create_cmd.add_argument(
+        "--mock",
+        action="store_true",
+        help="Run Planner in mock mode (no OpenAI cost)"
+    )
 
-@cli.command()
-def show():
-    """Show the latest generated plan."""
-    if not os.path.exists(SESSION_FILE):
-        click.echo("No session found. Run `create` first.")
+    args = parser.parse_args()
+
+    if args.command == "create":
+        return run_create(args)
+    else:
+        print("No command provided. Use --help for options.")
         return
-    click.echo(open(SESSION_FILE, "r", encoding="utf-8").read())
+
+
+def run_create(args):
+    print("\n=== Coforge Studios: Planner Agent ===\n")
+
+    user_input = args.request
+    use_mock = args.mock
+
+    print(f"[CLI] User Request: {user_input}")
+    if use_mock:
+        print("[CLI] Running in MOCK MODE (no OpenAI calls)\n")
+
+    # Initialize planner
+    planner = Planner(
+        schema_path="agents/schemas/plan_schema.json",
+        model_name="gpt-4o-mini",
+        mock=use_mock
+    )
+
+    # Run planner (interactive clarifying loop)
+    try:
+        plan = planner.run(user_input)
+    except Exception as e:
+        print(f"\n[ERROR] Planner failed:\n{e}")
+        sys.exit(1)
+
+    # Display plan nicely
+    print("\n=== Final Plan (JSON) ===\n")
+    print(pretty_print_plan(plan))
+    print("\n======================================\n")
+    print("✔ Plan saved as an envelope in: envelopes/")
+    print("✔ You can now pass this plan to the Builder agent.")
+    print()
+
+    return plan
+
 
 if __name__ == "__main__":
-    cli()
+    main()

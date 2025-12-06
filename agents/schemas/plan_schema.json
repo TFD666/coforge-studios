@@ -2,30 +2,118 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "PlannerPlan",
     "type": "object",
-    "required": ["intent", "constraints", "acceptance_criteria", "deliverables", "steps"],
+    "required": ["plan_id", "plan_version", "created_at", "user_input", "intent", "acceptance_criteria", "deliverables", "steps"],
+    "additionalProperties": false,
     "properties": {
-      "intent": { "type": "string" },
-      "constraints": { "type": "object" },
-      "acceptance_criteria": {
-        "type": "array",
-        "items": { "type": "string" }
+      "plan_id": {
+        "type": "string",
+        "description": "UUIDv4 identifier for this plan"
       },
-      "deliverables": {
-        "type": "array",
-        "items": { "type": "string" }
+      "plan_version": {
+        "type": "string",
+        "description": "Semantic version or integer (e.g. 1.0.0)"
       },
-      "steps": {
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": ["string", "null"],
+        "format": "date-time"
+      },
+      "user_input": {
+        "type": "string",
+        "description": "Raw text provided by the user"
+      },
+      "intent": {
+        "type": "string",
+        "description": "Distilled intent (short)"
+      },
+      "context": {
+        "type": "object",
+        "description": "Optional context: user preferences, environment",
+        "additionalProperties": true
+      },
+      "constraints": {
+        "type": "object",
+        "description": "Hard constraints (language, no external network, runtime, banned libs)",
+        "additionalProperties": true
+      },
+      "clarifying_questions": {
         "type": "array",
         "items": {
           "type": "object",
-          "required": ["step_id", "description", "inputs", "expected_output"],
+          "required": ["question", "asked_at"],
           "properties": {
-            "step_id": { "type": "string" },
-            "description": { "type": "string" },
-            "inputs": { "type": "object" },
-            "expected_output": { "type": "string" }
-          }
+            "question": {"type": "string"},
+            "answer": {"type": ["string", "null"]},
+            "asked_at": {"type": "string", "format": "date-time"},
+            "answered_at": {"type": ["string", "null"], "format": "date-time"}
+          },
+          "additionalProperties": false
         }
+      },
+      "acceptance_criteria": {
+        "type": "array",
+        "minItems": 1,
+        "items": {"type": "string"},
+        "description": "What must be true for the plan to be accepted"
+      },
+      "deliverables": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "type", "path_hint"],
+          "properties": {
+            "name": {"type": "string"},
+            "type": {"type": "string", "enum": ["file", "folder", "artifact", "url", "docker_image", "binary"]},
+            "path_hint": {"type": "string", "description": "Where Builder should place it (relative path)"},
+            "description": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "steps": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["step_id", "title", "description", "type", "expected_output"],
+          "properties": {
+            "step_id": {"type": "string"},
+            "title": {"type": "string"},
+            "description": {"type": "string"},
+            "type": {"type": "string", "enum": ["code", "doc", "test", "config", "shell", "other"]},
+            "inputs": {"type": "object", "additionalProperties": true},
+            "expected_output": {"type": "string"},
+            "dependencies": {"type": "array", "items": {"type": "string"}},
+            "estimated_time_minutes": {"type": ["integer", "null"], "minimum": 1},
+            "test_cases": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "type", "command_or_assertion"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "type": {"type": "string", "enum": ["unit", "integration", "smoke", "manual"]},
+                  "command_or_assertion": {"type": "string"},
+                  "expected_result": {"type": "string"}
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "author": {"type": "string"},
+          "priority": {"type": "string", "enum": ["low", "medium", "high"], "default": "medium"},
+          "tags": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": false
       }
     }
   }

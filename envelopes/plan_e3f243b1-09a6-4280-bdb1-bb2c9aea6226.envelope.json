@@ -1,0 +1,57 @@
+{
+  "envelope_id": "f74cb6dc-2e73-42a8-a6b3-dbc9753d9485",
+  "from_agent": "Planner",
+  "to_agent": "Builder",
+  "timestamp": "2025-12-05T23:17:41.001347Z",
+  "message_type": "plan",
+  "payload": {
+    "plan_id": "e3f243b1-09a6-4280-bdb1-bb2c9aea6226",
+    "plan_version": "1.0.0",
+    "created_at": "2025-12-05T23:17:40.934948Z",
+    "user_input": "Create a simple todo CLI in Python; persist tasks to JSON",
+    "intent": "mock_intent",
+    "context": {
+      "language": "python"
+    },
+    "constraints": {},
+    "clarifying_questions": [
+      {
+        "question": "Do you prefer Python or JavaScript?",
+        "answer": "javascript",
+        "asked_at": "2025-12-05T23:17:32.871000Z",
+        "answered_at": "2025-12-05T23:17:32.871000Z"
+      },
+      {
+        "question": "Should the output include built-in tests? (yes/no)",
+        "answer": "yes",
+        "asked_at": "2025-12-05T23:17:40.934948Z",
+        "answered_at": "2025-12-05T23:17:40.934948Z"
+      }
+    ],
+    "acceptance_criteria": [
+      "Runs without errors",
+      "Produces expected output"
+    ],
+    "deliverables": [
+      {
+        "name": "main.py",
+        "type": "file",
+        "path_hint": "./",
+        "description": "Main script"
+      }
+    ],
+    "steps": [
+      {
+        "step_id": "1",
+        "title": "Initialize project",
+        "description": "Create starter file structure",
+        "type": "code",
+        "expected_output": "main.py created"
+      }
+    ],
+    "metadata": {
+      "author": "planner_mock"
+    }
+  },
+  "meta": {}
+}
